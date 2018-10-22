@@ -11,7 +11,16 @@ public class GameManager : MonoBehaviour {
     public Text text;
     public Button left, right, select;
     public List<int> seen = new List<int>();
-    public Category[] categories = {new Category("Waterloo"), new Category("PopMusic")};
+    public Category[] categories = {
+        new Category("Waterloo Memes"),
+        new Category("Pop Music"),
+        new Category("Animals") ,
+        new Category("Companies") ,
+        new Category("Countries"),
+        new Category("Impressions"),
+        new Category("TV Shows"),
+        new Category("Movies")
+    };
     int category = 0;
     int score = 0;
     int prompt = 0;
@@ -43,13 +52,7 @@ public class GameManager : MonoBehaviour {
         }
         else if (state == GameState.TIMEUP)
         {
-            timer -= Time.deltaTime;
             text.text = "SCORE: " + score;
-            if (timer <= 0)
-            {
-                state = GameState.CHOOSE_PROMPT;
-                timer = 0;
-            }
         }
         else if (state == GameState.CHOOSE_PROMPT)
         {
@@ -77,7 +80,11 @@ public class GameManager : MonoBehaviour {
     }
     public void SelectButton()
     {
-        if (state == GameState.CHOOSE_PROMPT)
+        if (state == GameState.TIMEUP)
+        {
+            state = GameState.CHOOSE_PROMPT;
+        }
+        else if (state == GameState.CHOOSE_PROMPT)
         {
             state = GameState.PLAY;
             score = 0;
@@ -119,13 +126,12 @@ public class GameManager : MonoBehaviour {
                     }
                     while (line != null);  
                     theReader.Close();
-                    return;
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine("{0}\n", e.Message);
-                return;
+                
             }
         }
     }
