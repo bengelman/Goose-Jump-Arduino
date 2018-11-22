@@ -1,7 +1,14 @@
 
+
 #include "pitches.h"
 #include<Wire.h>
+//#include<LiquidCrystal_I2C.h>
 //#include <Scheduler.h>
+
+
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
+
 
 const int MPU_addr=0x68;
 int16_t AcX,AcY,AcZ,Tmp,GyX,GyY,GyZ;
@@ -29,39 +36,52 @@ int themeNum = 3;
 float initialZ = 0;
 float lastMillis = 0;
 
-int click[] = {NOTE_B3};
+int clickm[] = {NOTE_B2};
 int clickNotes[] = {2};
 
 
 int playing = 0;
 int* melody;
 int startup[] = {
-  NOTE_C4, NOTE_G3, NOTE_G3, NOTE_A3, NOTE_G3, 0, NOTE_B3, NOTE_C4
+  NOTE_E5, NOTE_E5, 0, NOTE_E5, 0, NOTE_C5, NOTE_E5, 0, NOTE_G5, 0, 0, NOTE_G4, 0, 0
 };
 int* noteDurations;
 int startNotes[] = {
-  4, 8, 8, 4, 4, 4, 4, 4
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 4, 8, 8, 4
 };
-int melodyLength = 8;
-float songTime = 0;
+int timesup[] = {
+  NOTE_C5, 0, 0, NOTE_G4, 0, NOTE_E4, NOTE_A4, NOTE_B4, NOTE_A4, NOTE_GS4, NOTE_AS4, NOTE_GS4, NOTE_E4, NOTE_D4, NOTE_E4
+};
+int timesupNotes[] = {
+  8, 8, 8, 8, 4, 4, 6, 6, 6, 6, 6, 6, 8, 8, 2
+};
+int melodyLength = 14;
+float songDelay = 0;
 void playSong(){
+  songDelay -= millis() - songMillis;
+  songMillis = millis();
   if (playing > melodyLength){
-    noTone(10);
-    noTone(11);
+    if (songDelay <= 0){
+      noTone(10);
+      noTone(11);
+    }
     return;
   }
-  songTime += millis() - songMillis;
-  songMillis = millis();
-  if (((int)(songTime / 1000)) == playing){
+  
+  if (songDelay <= 0){
     int noteDuration = 1000 / noteDurations[playing];
     tone(10, melody[playing], noteDuration);
     tone(11, melody[playing], noteDuration);
+    songDelay = noteDuration;
     playing++;
   }
   
 }
 
 void setup() {
+  lcd.begin(16, 2);
+  // Print a message to the LCD.
+  lcd.backlight();
   melody = startup;
   noteDurations = startNotes;
   songMillis = millis();
@@ -74,7 +94,8 @@ void setup() {
   Serial.begin(9600);
   // put your setup code here, to run once:
   timer = 10000;
-  
+  lcd.setCursor(0,0);
+  lcd.print("hello, world!");
 }
 void loop() {
   readGyro();
@@ -102,7 +123,10 @@ void loop() {
       theme %= themeNum;
     }
     if (gyro()){
-      
+      playing = 0; 
+      melodyLength = 1;
+      melody = clickm;
+      noteDurations = clickNotes;
       if (theme == 0){
         String promptWaterloo[] = {"Mr Goose", "SYDE", "LOO! LOO! LOO!", "WEEF TAs", "Join the Slack", "Hell week", "Ideas Clinic", "Cindy?", "Baklava", "Edcom", "Bo Peng", "AIF", "Side projects", "Schulich Leaders", "The Arts Faculty"};
         
@@ -124,7 +148,11 @@ void loop() {
   if (state == PLAY){
     displayText(promptName);
     if (gyro()){
+      playing = 0; 
       
+      melodyLength = 1;
+      melody = clickm;
+      noteDurations = clickNotes;
       score++;
       if (theme == 0){
         String promptWaterloo[] = {"Mr Goose", "SYDE", "LOO! LOO! LOO!", "WEEF TAs", "Join the Slack", "Hell week", "Ideas Clinic", "Cindy?", "Baklava", "Edcom", "Bo Peng", "AIF", "Side projects", "Schulich Leaders", "The Arts Faculty"};
@@ -145,7 +173,10 @@ void loop() {
     if (timer <= 0){
       state = END;
       timer = 5000;
-      
+      playing = 0; 
+      melodyLength = 15;
+      melody = timesup;
+      noteDurations = timesupNotes;
     }
   }
   if (state == END){
@@ -158,8 +189,24 @@ void loop() {
   
   
 }
+
 void displayText(String toDisplay){
-  
+  return;
+  lcd.begin(16, 2);
+  //lcd.backlight();
+  lcd.setCursor(0,0);
+  lcd.print("Hello world!");
+  return;
+  //lcd.clear();
+  if (toDisplay.length() > 16){
+    String first = toDisplay.substring(0, 16);
+    String second = toDisplay.substring(16, toDisplay.length());
+    lcd.print(first);
+    lcd.setCursor(0,1);
+    lcd.print(second);
+  }
+  else
+    lcd.print(toDisplay);
 }
 void readGyro(){
   Wire.beginTransmission(MPU_addr);

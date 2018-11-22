@@ -24,6 +24,11 @@ public class Goose : MonoBehaviour {
             GetComponent<ArduinoConnector>().WriteToArduino("TIMEUP");
             SceneManager.LoadScene("Menu");
         }
+        if (transform.position.y > 95)
+        {
+            GetComponent<ArduinoConnector>().WriteToArduino("WIN");
+            SceneManager.LoadScene("Menu");
+        }
         GetComponent<Rigidbody2D>().velocity = new Vector3(Mathf.Sin(GetComponent<ArduinoConnector>().GetProcessedRotation()) * 4, GetComponent<Rigidbody2D>().velocity.y, 0);
 	}
     void OnCollisionEnter2D(Collision2D col)
@@ -49,7 +54,7 @@ public class Goose : MonoBehaviour {
             if (transform.position.y > col.transform.position.y)
             {
                 col.gameObject.transform.position = new Vector3(-100, 0, 0);
-                GetComponent<Rigidbody2D>().velocity = new Vector3(GetComponent<Rigidbody2D>().velocity.x, 5, 0);
+                GetComponent<Rigidbody2D>().velocity = new Vector3(GetComponent<Rigidbody2D>().velocity.x, 8, 0);
                 GetComponent<ArduinoConnector>().WriteToArduino("BREAK");
             }
         }
