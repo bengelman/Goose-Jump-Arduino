@@ -1,0 +1,2 @@
+C:\Users\brend\Documents\GitHub\se101-f18-group-aj6campb-badengel\Goose Jump\obj\Debug\Assembly-CSharp.csprojAssemblyReference.cache
+C:\Users\brend\Documents\GitHub\se101-f18-group-aj6campb-badengel\Goose Jump\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache
