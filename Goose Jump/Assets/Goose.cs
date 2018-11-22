@@ -24,7 +24,7 @@ public class Goose : MonoBehaviour {
             GetComponent<ArduinoConnector>().WriteToArduino("TIMEUP");
             SceneManager.LoadScene("Menu");
         }
-        if (transform.position.y > 95)
+        if (transform.position.y > 100)
         {
             GetComponent<ArduinoConnector>().WriteToArduino("WIN");
             SceneManager.LoadScene("Menu");
@@ -33,7 +33,7 @@ public class Goose : MonoBehaviour {
 	}
     void OnCollisionEnter2D(Collision2D col)
     {
-        if (col.gameObject.tag.Equals("platform_uw"))
+        if (col.gameObject.tag.Equals("platform_uw") || col.gameObject.tag.Equals("platform_sci"))
         {
             if (transform.position.y > col.transform.position.y)
             {
